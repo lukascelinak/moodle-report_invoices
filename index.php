@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * The Attendance Invoices Report.
+ * The Invoices Report.
  *
  * @package     report_invoices
  * @category    admin
@@ -63,6 +63,7 @@ if ($data instanceof stdClass) {
     unset($data->submitbutton);
     $cache->set('data', $data);
 }
+
 
 $mtable = new \report_invoices\table\invoices_issued_table('invoicestable');
 $mtable->is_downloading($download, get_string('pluginname', 'report_invoices') . " - " . date('d-M-Y g-i a'), 'invoicesexport');

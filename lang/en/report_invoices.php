@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * The Attendance Invoices Report plugin strings are defined here.
+ * The Invoices Report plugin strings are defined here.
  *
  * @package     report_invoices
  * @category    string
@@ -25,13 +25,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['pluginname'] = 'Attendance Invoices Report';
+$string['pluginname'] = 'Invoices Report';
 
 /****************** The report Users Attendance Invoices strings ****************/
-$string['eventreportviewed'] = 'Attendance Invoices Report viewed';
+$string['eventreportviewed'] = 'Invoices Report viewed';
 $string['firstacess'] = 'First Access Site Date';
-$string['settingsheader'] = 'Attendance Invoices Report settings';
-$string['settingsheaderdesc'] = 'Attendance Invoices Report settings';
+$string['settingsheader'] = 'Invoices Report settings';
+$string['settingsheaderdesc'] = 'Invoices Report settings';
 $string['userstotal'] = '{$a} users loaded.';
 $string['showall'] = 'Show only users with duration > 0';
 $string['totalduration'] = 'Total duration on the platform';
@@ -42,3 +42,39 @@ $string['profilecustomfields_help'] = 'Select category or profile custom fields 
                                        order of columns is same as order of fields in category.';
 $string['timelimit'] = 'Time limit';
 $string['timelimit_help'] = 'Time limit for calculations.';
+
+$string['name'] = 'Name';
+$string['ico'] = 'Id number';
+$string['vat'] = 'VAT id number';
+$string['zip'] = 'Zip code';
+$string['street'] = 'Street';
+$string['currency'] = 'Currency';
+$string['itemcode'] = 'Item code';
+$string['itemname'] = 'Item name';
+$string['description'] = 'Item Description';
+$string['itemprice'] = 'Item price';
+$string['quantity'] = 'Quantitiy';
+$string['amount'] = 'Amount';
+$string['totalamount'] = 'Amount incl. tax';
+$string['taxdate'] = 'Tax performance date';
+$string['issuancedate'] = 'Issuance date';
+$string['duedate'] = 'Due date';
+
+$string['dwn_name'] = 'protistrana_lv_nazev';
+$string['dwn_ico'] = 'protistrana_lv_ic';
+$string['dwn_vat'] = 'protistrana_lv_dic';
+$string['dwn_zip'] = 'protistrana_lv_psc';
+$string['dwn_street'] = 'protistrana_lv_ulice';
+$string['dwn_city'] = 'protistrana_lv_obec';
+$string['dwn_country'] = 'protistrana_lv_stat';
+$string['dwn_currency'] = 'mena';
+$string['dwn_itemcode'] = 'polozka_lv_kodzbozi';
+$string['dwn_itemname'] = 'polozka_lv_nazevzbozi';
+$string['dwn_description'] = 'polozka_lv_podrobnosti';
+$string['dwn_itemprice'] = 'polozka_lv_cenamj';
+$string['dwn_quantity'] = 'polozka_lv_pocet';
+$string['dwn_amount'] = 'polozka_lv_castka';
+$string['dwn_totalamount'] = 'polozka_lv_vcetnedph';
+$string['dwn_taxdate'] = 'datum_zd_pl';
+$string['dwn_issuancedate'] = 'datum_vystaveni';
+$string['dwn_duedate'] = 'datum_splatnosti';

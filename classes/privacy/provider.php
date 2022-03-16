@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The Attendance Invoices Report.
+ * The Invoices Report.
  *
  * @package     report_invoices
  * @category    admin

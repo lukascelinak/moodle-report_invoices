@@ -1,4 +1,4 @@
-# Attendance Invoices Report #
+# Invoices Report #
 
 Report Attendance Invoices is listing users active education duration on the platform. 
 

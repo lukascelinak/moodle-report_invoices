@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The Attendance Invoices Report viewed class.
+ * The Invoices Report viewed class.
  *
  * @package     report_invoices
  * @category    admin
@@ -61,7 +61,7 @@ class report_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the Attendance Invoices report.";
+        return "The user with id '$this->userid' viewed the Invoices Report.";
     }
 
     /**

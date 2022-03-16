@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The Attendance Invoices Report search form definition.
+ * The Invoices Report search form definition.
  *
  * @package     report_invoices
  * @category    admin

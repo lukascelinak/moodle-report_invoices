@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * The Attendance Invoices Report plugin version and other meta-data.
+ * The Invoices Report plugin version and other meta-data.
  *
  * @package     report_invoices
  * @copyright   2022 Lukas Celinak, Edumood,  <lukascelinak@gmail.com>
@@ -24,8 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+/** @var object $plugin */
 $plugin->component = 'report_invoices';
 $plugin->release = '1.00.0';
-$plugin->version = 2022031001;
+$plugin->version = 2022031600;
 $plugin->requires = 2019052000;
 $plugin->maturity = MATURITY_STABLE;

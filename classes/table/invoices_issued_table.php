@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * The Attendance Invoices Report table class.
+ * The Invoices Report table class.
  *
  * @package     report_invoices
  * @copyright   2022 Lukas Celinak <lukascelinak@gmail.com>
@@ -75,72 +75,75 @@ class invoices_issued_table extends \table_sql {
         $this->downloadable = true;
         $this->set_attribute('class', 'table-bordered');
 
-        $headers = [ get_string('username',)];
-        $columns = ['protistranalv1nazev'];
 
-        $columns[]="protistranalv1ic";
-        $headers[]=get_string('firstname');
-
-        $columns[]="protistranalv1dic";
-        $headers[]=get_string('firstname');
+        $columns = ['nazev'];
+        $columns[]="ico";
+        $columns[]="dic";
+        $columns[]="ulice";
+        $columns[]="psc";
+        $columns[]="obec";
+        $columns[]="stat";
+        $columns[]="mena";
+        $columns[]="kodzbozi";
+        $columns[]="nazevzbozi";
+        $columns[]="podrobnosti";
+        $columns[]="cenamj";
+        $columns[]="pocet";
+        $columns[]="castka";
+        $columns[]="vcetnedph";
+        $columns[]="datum_zd_pl";
+        $columns[]="datum_vystaveni";
+        $columns[]="datum_splatnosti";
 
         if($this->is_downloading()){
-            $columns[]="protistranalv1ulice";
-            $headers[]=get_string('firstname');
-
-            $columns[]="protistranalv1psc";
-            $headers[]= get_string('lastname');
-
-            $columns[]="protistranalv1obec";
-            $headers[]= get_string('lastname');
-        }
-
-        $columns[]="protistranalv1stat";
-        $headers[]= get_string('lastname');
-
-        $columns[]="mena";
-        $headers[]= get_string('lastname');
-
-        $columns[]="polozkalv1kodzbozi";
-        $headers[]= get_string('lastname');
-
-        $columns[]="polozkalv1nazevzbozi";
-        $headers[]= get_string('lastname');
-
-        $columns[]="polozkalv1podrobnosti";
-        $headers[]= get_string('lastname');
-
-        $columns[]="polozkalv1cenamj";
-        $headers[]= get_string('lastname');
-
-        $columns[]="polozkalv1pocet";
-        $headers[]= get_string('lastname');
-
-        $columns[]="polozkalv1castka";
-        $headers[]= get_string('lastname');
-
-        $columns[]="polozkalv1vcetnedph";
-        $headers[]= get_string('lastname');
-
-        $columns[]="datum_zd_pl";
-        $headers[]=get_string('cohort','cohort');
-
-        $columns[]="datum_vystaveni";
-        $headers[]=get_string('visits','report_invoices');
-
-        $columns[]="datum_splatnosti";
-        $headers[]=get_string('totalduration','report_invoices');
+            $headers = [ get_string('dwn_name','report_invoices')];
+            $headers[]=get_string('dwn_ico','report_invoices');
+            $headers[]=get_string('dwn_vat','report_invoices');
+            $headers[]=get_string('dwn_street','report_invoices');
+            $headers[]=get_string('dwn_zip','report_invoices');
+            $headers[]=get_string('dwn_city','report_invoices');
+            $headers[]=get_string('dwn_country','report_invoices');
+            $headers[]=get_string('dwn_currency','report_invoices');
+            $headers[]=get_string('dwn_itemcode','report_invoices');
+            $headers[]=get_string('dwn_itemname','report_invoices');
+            $headers[]=get_string('dwn_description','report_invoices');
+            $headers[]=get_string('dwn_itemprice','report_invoices');
+            $headers[]=get_string('dwn_quantity','report_invoices');
+            $headers[]=get_string('dwn_amount','report_invoices');
+            $headers[]=get_string('dwn_totalamount','report_invoices');
+            $headers[]=get_string('dwn_taxdate','report_invoices');
+            $headers[]=get_string('dwn_issuancedate','report_invoices');
+            $headers[]=get_string('dwn_duedate','report_invoices');
+        }else{
+            $headers = [ get_string('name','report_invoices')];
+            $headers[]=get_string('ico','report_invoices');
+            $headers[]=get_string('vat','report_invoices');
+            $headers[]=get_string('street','report_invoices');
+            $headers[]=get_string('zip','report_invoices');
+            $headers[]=get_string('city');
+            $headers[]=get_string('country');
+            $headers[]=get_string('currency','report_invoices');
+            $headers[]=get_string('itemcode','report_invoices');
+            $headers[]=get_string('itemname','report_invoices');
+            $headers[]=get_string('description','report_invoices');
+            $headers[]=get_string('itemprice','report_invoices');
+            $headers[]=get_string('quantity','report_invoices');
+            $headers[]=get_string('amount','report_invoices');
+            $headers[]=get_string('totalamount','report_invoices');
+            $headers[]=get_string('taxdate','report_invoices');
+            $headers[]=get_string('issuancedate','report_invoices');
+            $headers[]=get_string('duedate','report_invoices');}
 
         $extrafields = [];
 
         $this->define_columns($columns);
         $this->define_headers($headers);
 
-        $this->no_sorting('datum_splatnosti');
-        $this->no_sorting('datum_vystaveni');
+      //  $this->no_sorting('datum_splatnosti');
+      //  $this->no_sorting('datum_vystaveni');
 
         // Make this table sorted by last name by default.
-        $this->sortable(true, 'protistrana-nazev');
+        $this->sortable(true, 'nazev');
         $this->extrafields = $extrafields;
 
         parent::out($pagesize, $useinitialsbar, $downloadhelpbutton);
@@ -152,8 +155,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_protistranalv1nazev($data) {
-            return $data->username;
+    public function col_nazev($data) {
+            return $data->nazev;
     }
 
     /**
@@ -162,8 +165,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_protistranalv1ic($data) {
-        return $data->firstname;
+    public function col_ico($data) {
+        return $data->ico;
     }
 
     /**
@@ -172,8 +175,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_protistranalv1dic($data) {
-        return $data->lastname;
+    public function col_dic($data) {
+        return $data->dic;
     }
 
     /**
@@ -182,8 +185,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_protistranalv1ulice($data) {
-
+    public function col_ulice($data) {
+        return $data->ulice;
     }
 
     /**
@@ -193,7 +196,7 @@ class invoices_issued_table extends \table_sql {
      * @return string
      */
     public function col_mena($data) {
-
+        return $data->mena;
     }
 
     /**
@@ -202,8 +205,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_protistranalv1psc($data) {
-        return $data->successfullogins;
+    public function col_psc($data) {
+        return $data->psc;
     }
 
     /**
@@ -212,8 +215,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_protistranalv1obec($data) {
-        return $data->visits;
+    public function col_obec($data) {
+        return $data->obec;
     }
 
     /**
@@ -222,8 +225,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_protistranalv1stat($data) {
-
+    public function col_stat($data) {
+        return $data->stat;
     }
 
     /**
@@ -232,8 +235,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_polozkalv1kodzbozi($data) {
-        return $data->cohort;
+    public function col_kodzbozi($data) {
+        return $data->kodzbozi;
     }
 
     /**
@@ -242,8 +245,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_polozkalv1nazevzbozi($data) {
-        return $data->cohort;
+    public function col_nazevzbozi($data) {
+        return $data->nazevzbozi;
     }
 
     /**
@@ -252,8 +255,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_polozkalv1podrobnosti($data) {
-        return $data->cohort;
+    public function col_podrobnosti($data) {
+        return $data->podrobnosti;
     }
 
     /**
@@ -262,8 +265,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_polozkalv1cenamj($data) {
-        return $data->cohort;
+    public function col_cenamj($data) {
+        return $data->cenamj;
     }
 
     /**
@@ -272,8 +275,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_polozkalv1pocet($data) {
-        return $data->cohort;
+    public function col_pocet($data) {
+        return $data->pocet;
     }
 
     /**
@@ -282,8 +285,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_polozkalv1castka($data) {
-        return $data->cohort;
+    public function col_castka($data) {
+        return $data->castka;
     }
 
     /**
@@ -292,8 +295,8 @@ class invoices_issued_table extends \table_sql {
      * @param \stdClass $data
      * @return string
      */
-    public function col_polozkalv1vcetnedph($data) {
-        return $data->cohort;
+    public function col_vcetnedph($data) {
+        return $data->vcetnedph;
     }
 
     /**
@@ -303,7 +306,7 @@ class invoices_issued_table extends \table_sql {
      * @return string
      */
     public function col_datum_zd_pl($data) {
-        return $data->cohort;
+        return $data->datum_zd_pl;
     }
 
     /**
@@ -313,7 +316,7 @@ class invoices_issued_table extends \table_sql {
      * @return string
      */
     public function col_datum_vystaveni($data) {
-        return $data->cohort;
+        return $data->datum_vystaveni;
     }
 
     /**
@@ -323,7 +326,7 @@ class invoices_issued_table extends \table_sql {
      * @return string
      */
     public function col_datum_splatnosti($data) {
-        return $data->cohort;
+        return $data->datum_splatnosti;
     }
 
 
@@ -420,25 +423,25 @@ class invoices_issued_table extends \table_sql {
         global $DB;
         $params=array();
         $select = "SELECT ";
-        $what = "u.id, u.username as ,
-         u.username as protistranalv1nazev,
-         u.username as protistranalv1ic,
-         u.username as protistranalv1dic,
-         u.username as protistranalv1ulice,
-         u.username as protistranalv1psc,
-         u.username as protistranalv1obec,
-         u.username as protistranalv1stat,
-         u.username as mena,
-         u.username as polozkalv1kodzbozi,
-         u.username as polozkalv1nazevzbozi,
-         u.username as polozkalv1podrobnosti,
-         u.username as polozkalv1cenamj,
-         u.username as polozkalv1pocet,
-         u.username as polozkalv1castka,
-         u.username as polozkalv1vcetnedph,
-         u.username as datum_zd_pl,
-         u.username as datum_vystaveni,
-         u.username as datum_splatnosti ";
+        $what = "u.id,
+         u.firstname as nazev,
+         u.firstname as ico,
+         u.firstname as dic,
+         u.firstname as ulice,
+         u.firstname as psc,
+         u.firstname as obec,
+         u.firstname as stat,
+         u.firstname as mena,
+         u.firstname as kodzbozi,
+         u.firstname as nazevzbozi,
+         u.firstname as podrobnosti,
+         u.firstname as cenamj,
+         u.firstname as pocet,
+         u.firstname as castka,
+         u.firstname as vcetnedph,
+         u.firstname as datum_zd_pl,
+         u.firstname as datum_vystaveni,
+         u.firstname as datum_splatnosti ";
         $from = "FROM {user} u ";
         $where = "";
         $groupby = "";

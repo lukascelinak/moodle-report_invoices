@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * The Attendance Invoices Report plugin administration.
+ * The Invoices Report plugin administration.
  *
  * @package     report_invoices
  * @category    admin
@@ -28,19 +28,3 @@ $ADMIN->add('reports', new admin_externalpage('report_invoices', get_string('plu
                         'report_invoices'),
                 "$CFG->wwwroot/report/invoices/index.php",
                 'report/invoices:view'));
-
-if($categories = $DB->get_records('user_info_category')){
-    $categoriesarray = [];
-    foreach ($categories as $category) {
-        $categoriesarray[$category->id] = $category->name;
-    }
-
-    $settings->add(new admin_setting_configselect('report_invoices/profilecustomfields', get_string('profilecustomfields', 'report_invoices'),
-        get_string('profilecustomfields_help', 'report_invoices'), NULL,
-        $categoriesarray));
-}
-
-
-$settings->add(new admin_setting_configduration('report_invoices/timelimit',
-    get_string('timelimit', 'report_invoices'),
-    get_string('timelimit_help', 'report_invoices'), 1800,60));

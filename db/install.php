@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * The Attendance Invoices Report install.
+ * The Invoices Report install.
  *
  * @package     report_eractivity
  * @category    upgrade
