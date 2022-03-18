@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /** @var object $plugin */
 $plugin->component = 'report_invoices';
-$plugin->release = '1.00.0';
-$plugin->version = 2022031600;
-$plugin->requires = 2019052000;
+$plugin->release = '3.01.0';
+$plugin->version = 2022031800;
+$plugin->requires = 2016052300;
 $plugin->maturity = MATURITY_STABLE;

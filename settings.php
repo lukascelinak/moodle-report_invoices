@@ -28,3 +28,15 @@ $ADMIN->add('reports', new admin_externalpage('report_invoices', get_string('plu
                         'report_invoices'),
                 "$CFG->wwwroot/report/invoices/index.php",
                 'report/invoices:view'));
+
+$settings->add(new admin_setting_configtext('report_invoices/country', get_string('country', 'report_invoices'),
+    get_string('country_help', 'report_invoices'), "CZ - Česká republika", PARAM_TEXT));
+
+$settings->add(new admin_setting_configtext('report_invoices/currency', get_string('currency', 'report_invoices'),
+    get_string('currency_help', 'report_invoices'), 'CZK', PARAM_TEXT));
+
+$settings->add(new admin_setting_configtext('report_invoices/vatvalue', get_string('vatvalue', 'report_invoices'),
+    get_string('vatvalue_help', 'report_invoices'), 21, PARAM_INT));
+
+$settings->add(new admin_setting_configduration('report_invoices/duedatevalue', get_string('duedate', 'report_invoices'),
+    get_string('duedate_help', 'report_invoices'), 1209600, 86400));

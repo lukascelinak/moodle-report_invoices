@@ -47,9 +47,8 @@ class search extends \moodleform {
     public function definition() {
         global $DB, $CFG;
         $mform = $this->_form;
-        $this->gradebookroles = $CFG->gradebookroles;
-        $mform->addElement('date_time_selector', 'datefrom', get_string('datefrom', 'report_configlog'), ['optional' => true]);
-        $mform->addElement('date_time_selector', 'dateto', get_string('dateto', 'report_configlog'), ['optional' => true]);
+        $mform->addElement('date_selector', 'datefrom', get_string('datefrom', 'report_invoices'));
+        $mform->addElement('date_selector', 'dateto', get_string('dateto', 'report_invoices'));
         $this->add_action_buttons(false, get_string('search'));
     }
 

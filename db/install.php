@@ -17,8 +17,8 @@
 /**
  * The Invoices Report install.
  *
- * @package     report_eractivity
- * @category    upgrade
+ * @package     report_invoices
+ * @category    admin
  * @copyright   2022 Lukas Celinak, Edumood,  <lukascelinak@gmail.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

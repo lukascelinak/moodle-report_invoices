@@ -1,6 +1,5 @@
 <?php
-
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,40 +12,44 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The Invoices Report.
+ *  The Invoices Report index file.
  *
  * @package     report_invoices
  * @category    admin
- * @copyright   2022 Lukas Celinak, Edumood,  <lukascelinak@gmail.com>
+ * @copyright   2022 Lukas Celinak, Edumood s.r.o. <lukascelinak@gmail.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-use core\report_helper;
 
 require(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
+require_once('locallib.php');
+
+ini_set('max_execution_time', '0');
 
 require_login();
-$context = context_system::instance();
-require_capability('report/invoices:view', $context);
 
 $download = optional_param('download', '', PARAM_ALPHA);
-
+$action = optional_param('what', 'view', PARAM_CLEAN);
 // Paging params for paging bars.
 $page = optional_param('page', 0, PARAM_INT); // Which page to show.
-$pagesize = optional_param('perpage', 25, PARAM_INT); // How many per page.
+$perpage = optional_param('perpage', 10, PARAM_INT); // How many per page.
+$context = context_system::instance();
 
 $url = new moodle_url('/report/invoices/index.php');
 $PAGE->set_url($url);
+$PAGE->set_pagelayout('report');
 $PAGE->set_context($context);
-admin_externalpage_setup('report_invoices', '', null, '', array('pagelayout' => 'report'));
-$PAGE->set_title(get_string('pluginname', 'report_invoices'));
-$PAGE->set_heading(get_string('pluginname', 'report_invoices'));
 
-$search = new stdClass();
+require_capability('report/invoices:view', $context);
+admin_externalpage_setup('report_invoices', '', null, '', array('pagelayout'=>'report'));
+
+$strcompletion = get_string('pluginname','report_invoices');
+
 $mform = new \report_invoices\form\search();
+$search = new stdClass();
 /** @var cache_session $cache */
 $cache = cache::make_from_params(cache_store::MODE_SESSION, 'report_invoices', 'search');
 if ($cachedata = $cache->get('data')) {
@@ -55,47 +58,38 @@ if ($cachedata = $cache->get('data')) {
 
 // Check if we have a form submission, or a cached submission.
 $data = ($mform->is_submitted() ? $mform->get_data() : fullclone($cachedata));
+
 if ($data instanceof stdClass) {
-    $search->from = !empty($data->datefrom)?$data->datefrom:null;
-    $search->to = !empty($data->dateto)?$data->dateto:null;
-    $search->showall=!empty($data->showall)?1:null;
+    $search->datefrom = !empty($data->datefrom)?$data->datefrom:null;
+    $search->dateto = !empty($data->dateto)?$data->dateto:null;
     // Cache form submission so that it is preserved while paging through the report.
     unset($data->submitbutton);
     $cache->set('data', $data);
 }
 
-
-$mtable = new \report_invoices\table\invoices_issued_table('invoicestable');
-$mtable->is_downloading($download, get_string('pluginname', 'report_invoices') . " - " . date('d-M-Y g-i a'), 'invoicesexport');
-$mtable->define_baseurl($url);
-
+$mtable = new flexible_table('invoices');
+$mtable->define_baseurl($PAGE->url);
+$mtable->is_downloading($download, "report_invoices_".date('d-m-Y_H-i-s',time()), "report_invoices");
 
 if (!$mtable->is_downloading()) {
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string('pluginname', 'report_invoices'));
+   echo $OUTPUT->header();
+    echo $OUTPUT->heading(get_string('laodinvoices', 'report_invoices'));
+
+}
+$PAGE->set_title($strcompletion);
+$PAGE->set_heading($strcompletion);
+
+if (!$mtable->is_downloading()) {
     $mform->display();
 }
-    $mtable->init_table($search);
-    ob_start();
-    $mtable->out($pagesize, false);
-    $mtablehtml = ob_get_contents();
-    ob_end_clean();
 
-
-if (!$mtable->is_downloading()) {
-    echo html_writer::tag(
-            'p',
-            get_string('userstotal', 'report_invoices', $mtable->totalrows),
-            [
-                'data-region' => 'reportinvoicestable-count',
-            ]
-    );
-}
-
-if (!$mtable->is_downloading()) {
-    echo $mtablehtml;
+if(property_exists($search, "datefrom") && !empty($search->datefrom)&&property_exists($search, "dateto")&&!empty($search->dateto)){
+report_invoices_get_table($mtable,$search);
 }
 
 if (!$mtable->is_downloading()) {
     echo $OUTPUT->footer();
 }
+
+$event = \report_invoices\event\report_viewed::create(array('context' => $context));
+$event->trigger();

@@ -23,12 +23,12 @@
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace report_finalgrades\event;
+namespace report_invoices\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The report Attendance Invoices viewed event class.
+ * The Invoices Report viewed event class.
  *
  * @package    report_invoices
  * @copyright  2022 Lukas Celinak, Edumood,  <lukascelinak@gmail.com>

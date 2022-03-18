@@ -1,10 +1,8 @@
 # Invoices Report #
 
-Report Attendance Invoices is listing users active education duration on the platform. 
+Invoices Report is listing attended users with their properties for xml export. 
 
-You can select category of custom profile fields, these field will be shown in report.
-
-Report is using block dedication for duration on the platform calculations. 
+You need to choose filter search first. 
 
 ## Installing via uploaded ZIP file ##
 

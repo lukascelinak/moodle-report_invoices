@@ -28,27 +28,29 @@ defined('MOODLE_INTERNAL') || die();
 $string['pluginname'] = 'Invoices Report';
 
 /****************** The report Users Attendance Invoices strings ****************/
+
 $string['eventreportviewed'] = 'Invoices Report viewed';
-$string['firstacess'] = 'First Access Site Date';
+$string['invoices:view'] = 'View Invocies Report';
 $string['settingsheader'] = 'Invoices Report settings';
 $string['settingsheaderdesc'] = 'Invoices Report settings';
-$string['userstotal'] = '{$a} users loaded.';
-$string['showall'] = 'Show only users with duration > 0';
-$string['totalduration'] = 'Total duration on the platform';
-$string['successfullogins'] = 'Successful logins';
-$string['visits'] = 'Unique visits';
-$string['profilecustomfields'] = 'Profile custom fields category';
-$string['profilecustomfields_help'] = 'Select category or profile custom fields which would be shown in report, 
-                                       order of columns is same as order of fields in category.';
-$string['timelimit'] = 'Time limit';
-$string['timelimit_help'] = 'Time limit for calculations.';
-
+$string['count'] = '{$a} records loaded.';
+$string['laodinvoices'] = 'Search invoices';
+$string['actions'] = 'Actions';
+$string['datefrom'] = 'Date from';
+$string['dateto'] = 'Date to';
+$string['edit'] = 'Manage Session';
+$string['inout'] = 'In or out';
 $string['name'] = 'Name';
 $string['ico'] = 'Id number';
 $string['vat'] = 'VAT id number';
+$string['vatvalue'] = 'VAT';
+$string['vatvalue_help'] = 'VAT';
 $string['zip'] = 'Zip code';
+$string['country'] = 'Country';
+$string['country_help'] = 'Country';
 $string['street'] = 'Street';
 $string['currency'] = 'Currency';
+$string['currency_help'] = 'Currency';
 $string['itemcode'] = 'Item code';
 $string['itemname'] = 'Item name';
 $string['description'] = 'Item Description';
@@ -60,6 +62,9 @@ $string['taxdate'] = 'Tax performance date';
 $string['issuancedate'] = 'Issuance date';
 $string['duedate'] = 'Due date';
 
+$string['duedatedays'] = 'Due date in days';
+$string['duedate_help'] = 'Days value for due date calulation';
+$string['dwn_inout'] = 'smer';
 $string['dwn_name'] = 'protistrana_lv_nazev';
 $string['dwn_ico'] = 'protistrana_lv_ic';
 $string['dwn_vat'] = 'protistrana_lv_dic';
