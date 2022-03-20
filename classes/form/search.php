@@ -48,12 +48,17 @@ class search extends \moodleform {
         global $DB, $CFG;
         $mform = $this->_form;
         $mform->addElement('date_selector', 'datefrom', get_string('datefrom', 'report_invoices'));
+        $mform->addHelpButton('datefrom','datefrom','report_invoices');
         $mform->addElement('date_selector', 'dateto', get_string('dateto', 'report_invoices'));
+        $mform->addHelpButton('dateto','dateto','report_invoices');
         $this->add_action_buttons(false, get_string('search'));
     }
 
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
+        if ($data['datefrom']>$data['dateto']) {
+            $errors['datefrom'] = get_string("datefrom_error", "report_invoices");
+        }
         return $errors;
     }
 

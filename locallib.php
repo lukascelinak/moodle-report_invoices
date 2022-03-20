@@ -41,7 +41,7 @@ function report_invoices_count_data($mtable, $search) {
     global $DB;
     $params=array();
     $select = "SELECT ";
-    $what = "a.id, COUNT(*) OVER () AS total ";
+    $what = "COUNT(*) OVER () AS totalcount ";
     $from = "FROM {attendance_sessions} AS att ";
     $join = "LEFT JOIN {user} AS u ON att.lasttakenby = u.id
     JOIN {attendance} AS a ON att.attendanceid = a.id
@@ -56,20 +56,18 @@ function report_invoices_count_data($mtable, $search) {
 
     $where = "WHERE ctx.contextlevel = '50' AND att.description NOT LIKE '%Status \"A\"%' AND dck.content = 'Regular' ";
 
-    $where .= (property_exists($search, "datefrom") && !empty($search->datefrom))&&(!property_exists($search, "dateto"))
-        ? "AND att.sessdate > :datefrom {$search->datefrom} " : "";
-
-    $where .= (property_exists($search, "dateto") && !empty($search->dateto))&&(!property_exists($search, "datefrom"))
-        ? "AND att.sessdate < {$search->dateto} " : "";
-
-    $where .= (property_exists($search, "datefrom") && !empty($search->datefrom)&&property_exists($search, "dateto")&&!empty($search->dateto))
-        ? "AND att.sessdate BETWEEN {$search->datefrom} AND {$search->dateto} " : "";
+    if(property_exists($search, "datefrom") && !empty($search->datefrom)&&property_exists($search, "dateto")&&!empty($search->dateto)){
+        $where .= "AND att.sessdate BETWEEN {$search->datefrom} AND {$search->dateto} ";
+        $params['datefrom']=$search->datefrom;
+        $params['dateto']=$search->dateto;
+    }
 
     $groupby = "GROUP BY c.shortname LIMIT 1";
 
     $sql = $select .$what. $from . $join . $where . $groupby;
+    //return property_exists($search, "dateto")&& property_exists($search, "datefrom") ? $DB->get_record_sql($sql,$params)->totalcount:0;
+    return property_exists($search, "dateto")&& property_exists($search, "datefrom") ? $DB->get_field_sql($sql,$params):0;
 
-    return property_exists($search, "dateto")&& property_exists($search, "datefrom") ? $DB->count_records_sql($sql,$params):0;
 }
 
 /**
@@ -82,25 +80,30 @@ function report_invoices_count_data($mtable, $search) {
  */
 function report_invoices_get_data($mtable, $search) {
     global $DB;
-    $params=array();
+    $config=get_config('report_invoices');
+    $params=array('vatvalue'=>$config->vatvalue);
     $select = "SELECT ";
     $what = "att.id AS sessionid, 
              c.id as courseid,
-             ctx.id as cmid,
+             a.id as attendanceid,
              c.fullname as coursefullname,
-             c.shortname as courseshortname,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1333') as kodzbozi,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1334') as nazevzbozi,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '15') as nazev,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1335') as cenamj,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '78') as ico,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1336') as dic,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '77') as ulice,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1337') as psc,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1338') as obec,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1339') as podrobnosti,
+             c.shortname as course,
+             null as actions,
+             cast(count(*) * (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1335') as decimal(10,2)) as amount,
+             ROUND(((SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1335')
+             +((SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1335')/100)*:vatvalue)*count(*), 0) as totalamount,
+             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1333') as itemcode,
+             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1334') as itemname,
+             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '15') as name,
+             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1335') as itemprice,
+             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '78') as idnumber,
+             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1336') as vatnumber,
+             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '77') as street,
+             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1337') as zip,
+             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1338') as city,
+             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1339') as description,
              dck.content as payment,
-             count(*) as pocet ";
+             count(*) as itemtotal ";
     $from = "FROM {attendance_sessions} AS att ";
     $join = "LEFT JOIN {user} AS u ON att.lasttakenby = u.id
     LEFT JOIN {attendance} AS a ON att.attendanceid = a.id
@@ -115,14 +118,11 @@ function report_invoices_get_data($mtable, $search) {
 
     $where = "WHERE ctx.contextlevel = '50' AND att.description NOT LIKE '%Status \"A\"%' AND dck.content = 'Regular' ";
 
-    $where .= (property_exists($search, "datefrom") && !empty($search->datefrom))&&(!property_exists($search, "dateto"))
-        ? "AND att.sessdate > {$search->datefrom} " : "";
-
-    $where .= (property_exists($search, "dateto") && !empty($search->dateto))&&(!property_exists($search, "datefrom"))
-        ? "AND att.sessdate < {$search->dateto} " : "";
-
-    $where .= (property_exists($search, "datefrom") && !empty($search->datefrom)&&property_exists($search, "dateto")&&!empty($search->dateto))
-        ? "AND att.sessdate BETWEEN {$search->datefrom} AND {$search->dateto} " : "";
+    if(property_exists($search, "datefrom") && !empty($search->datefrom)&&property_exists($search, "dateto")&&!empty($search->dateto)){
+        $where .="AND att.sessdate BETWEEN {$search->datefrom} AND {$search->dateto} ";
+        $params['datefrom']=$search->datefrom;
+        $params['dateto']=$search->dateto;
+    }
 
     $groupby = "GROUP BY c.shortname ";
 
@@ -145,33 +145,40 @@ function report_invoices_get_table($mtable, $search) {
     global $CFG, $DB;
 
     // Columns definition
-    $columns = ['smer'];
+    $columns = ['actions'];
     !$mtable->is_downloading()? $columns[]="course":false;
-    $columns[]="nazev";
-    $columns[]="ico";
-    $columns[]="dic";
-    $columns[]="ulice";
-    $columns[]="psc";
-    $columns[]="obec";
-    $columns[]="stat";
-    $columns[]="mena";
-    $columns[]="kodzbozi";
-    $columns[]="nazevzbozi";
-    $columns[]="podrobnosti";
-    $columns[]="cenamj";
-    $columns[]="pocet";
-    $columns[]="castka";
-    $columns[]="vcetnedph";
-    $columns[]="datum_zd_pl";
-    $columns[]="datum_vystaveni";
-    $columns[]="datum_splatnosti";
+    $columns[]="name";
+    $columns[]="idnumber";
+    $columns[]="vatnumber";
+    $columns[]="street";
+    $columns[]="zip";
+    $columns[]="city";
+    $columns[]="country";
+    $columns[]="currency";
+    $columns[]="itemcode";
+    $columns[]="itemname";
+    $columns[]="description";
+    $columns[]="itemprice";
+    $columns[]="itemtotal";
+    $columns[]="amount";
+    $columns[]="totalamount";
+    $columns[]="datetax";
+    $columns[]="issuancedate";
+    $columns[]="duedate";
+
+    $mtable->no_sorting('actions');
+    $mtable->no_sorting('country');
+    $mtable->no_sorting('currency');
+    $mtable->no_sorting('datetax');
+    $mtable->no_sorting('issuancedate');
+    $mtable->no_sorting('duedate');
 
     // Headers definition, for download you can name headers in langstrings and make them compatible with import
     if( $mtable->is_downloading()){
-        $headers = [ get_string('dwn_inout','report_invoices')];
+        $headers = [ get_string('dwn_actions','report_invoices')];
         $headers[]=get_string('dwn_name','report_invoices');
-        $headers[]=get_string('dwn_ico','report_invoices');
-        $headers[]=get_string('dwn_vat','report_invoices');
+        $headers[]=get_string('dwn_idnumber','report_invoices');
+        $headers[]=get_string('dwn_vatnumber','report_invoices');
         $headers[]=get_string('dwn_street','report_invoices');
         $headers[]=get_string('dwn_zip','report_invoices');
         $headers[]=get_string('dwn_city','report_invoices');
@@ -183,6 +190,7 @@ function report_invoices_get_table($mtable, $search) {
         $headers[]=get_string('dwn_itemprice','report_invoices');
         $headers[]=get_string('dwn_quantity','report_invoices');
         $headers[]=get_string('dwn_amount','report_invoices');
+        $headers[]=get_string('dwn_vat','report_invoices');
         $headers[]=get_string('dwn_totalamount','report_invoices');
         $headers[]=get_string('dwn_taxdate','report_invoices');
         $headers[]=get_string('dwn_issuancedate','report_invoices');
@@ -191,8 +199,8 @@ function report_invoices_get_table($mtable, $search) {
         $headers = [ get_string('actions','report_invoices')];
         $headers[]=get_string('course');
         $headers[]=get_string('name','report_invoices');
-        $headers[]=get_string('ico','report_invoices');
-        $headers[]=get_string('vat','report_invoices');
+        $headers[]=get_string('idnumber','report_invoices');
+        $headers[]=get_string('vatnumber','report_invoices');
         $headers[]=get_string('street','report_invoices');
         $headers[]=get_string('zip','report_invoices');
         $headers[]=get_string('city');
@@ -218,45 +226,46 @@ function report_invoices_get_table($mtable, $search) {
         echo get_string("count", "report_invoices", $count);
     }
 
-    $mtable->sortable(true, 'nazev', SORT_DESC);
+    $mtable->sortable(true, 'name', SORT_DESC);
 
     if ($mtable->is_downloading() && $count) {
         $mtable->pagesize($count, $count);
     } else {
-        $mtable->pagesize(20, $count);
+        $mtable->pagesize($count, $count);
     }
 
     $mtable->setup();
 
     $invoicesdata = report_invoices_get_data($mtable, $search);
-
     foreach ($invoicesdata as $invoicedata) {
         $config=get_config('report_invoices');
 
         $courseurl = new moodle_url('/course/view.php', array('id' => $invoicedata->courseid));
         $coursebtn = html_writer::link($courseurl,$invoicedata->coursefullname);
 
-        $attendanceurl=new moodle_url('/mod/attendance/manage.php', array('id' => $invoicedata->cmid));
+        $cm = get_coursemodule_from_instance('attendance',$invoicedata->attendanceid,$invoicedata->courseid);
+        $attendanceurl=new moodle_url('/mod/attendance/manage.php', array('id' => $cm->id));
         $edit=get_string('edit','report_invoices');
         $attendancebtn=html_writer::link($attendanceurl,"<img src=\"{$CFG->wwwroot}/pix/t/edit.png\" title=\"{$edit}\" />");
 
         $data= $mtable->is_downloading()? array("V"):array($attendancebtn);
             !$mtable->is_downloading()? $data[]=$coursebtn:false;
-            $data[] = $invoicedata->nazev;
-            $data[] = $invoicedata->ico;
-            $data[] = $invoicedata->dic;
-            $data[] = $invoicedata->ulice;
-            $data[] = $invoicedata->psc;
-            $data[] = $invoicedata->obec;
+            $data[] = $invoicedata->name;
+            $data[] = $invoicedata->idnumber;
+            $data[] = $invoicedata->vatnumber;
+            $data[] = $invoicedata->street;
+            $data[] = $invoicedata->zip;
+            $data[] = $invoicedata->city;
             $data[] = $config->country;
             $data[] = $config->currency;
-            $data[] = $invoicedata->kodzbozi;
-            $data[] = $invoicedata->nazevzbozi;
-            $data[] = date("m/Y",$search->dateto)." ".$invoicedata->podrobnosti;
-            $data[] = $invoicedata->cenamj;
-            $data[] = $invoicedata->pocet;
-            $data[] = round($invoicedata->cenamj*$invoicedata->pocet, 2);
-            $data[] = round(($invoicedata->cenamj+($invoicedata->cenamj/100)*$config->vatvalue)*$invoicedata->pocet, 2);
+            $data[] = $invoicedata->itemcode;
+            $data[] = $invoicedata->itemname;
+            $data[] = date("m/Y",$search->dateto)." ".$invoicedata->description;
+            $data[] = $invoicedata->itemprice;
+            $data[] = $invoicedata->itemtotal;
+            $data[] = $invoicedata->amount;
+            $mtable->is_downloading()? $data[] = number_format((float)$config->vatvalue, 2, '.', ''):false;
+            $data[] = $invoicedata->totalamount;
             $data[] = date("Y-m-t",$search->dateto);
             $data[] = date("Y-m-d",time());
             $data[] = date("Y-m-d",time()+$config->duedatevalue);
