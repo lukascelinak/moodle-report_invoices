@@ -40,8 +40,8 @@ require_once($CFG->dirroot . '/user/lib.php');
 function report_invoices_count_data($mtable, $search) {
     global $DB;
     $params=array();
-    $select = "SELECT ";
-    $what = "COUNT(*) OVER () AS totalcount ";
+    $select = "SELECT COUNT(*) as totalcount FROM (SELECT ";
+    $what = "COUNT(*) ";
     $from = "FROM {attendance_sessions} AS att ";
     $join = "LEFT JOIN {user} AS u ON att.lasttakenby = u.id
     JOIN {attendance} AS a ON att.attendanceid = a.id
@@ -57,12 +57,12 @@ function report_invoices_count_data($mtable, $search) {
     $where = "WHERE ctx.contextlevel = '50' AND att.description NOT LIKE '%Status \"A\"%' AND dck.content = 'Regular' ";
 
     if(property_exists($search, "datefrom") && !empty($search->datefrom)&&property_exists($search, "dateto")&&!empty($search->dateto)){
-        $where .= "AND att.sessdate BETWEEN {$search->datefrom} AND {$search->dateto} ";
+        $where .="AND FROM_UNIXTIME(att.sessdate,'%Y-%m-%d') BETWEEN FROM_UNIXTIME({$search->datefrom},'%Y-%m-%d') AND FROM_UNIXTIME({$search->dateto},'%Y-%m-%d') ";
         $params['datefrom']=$search->datefrom;
         $params['dateto']=$search->dateto;
     }
 
-    $groupby = "GROUP BY c.shortname LIMIT 1";
+    $groupby = "GROUP BY c.shortname) AS counted";
 
     $sql = $select .$what. $from . $join . $where . $groupby;
     //return property_exists($search, "dateto")&& property_exists($search, "datefrom") ? $DB->get_record_sql($sql,$params)->totalcount:0;
@@ -119,10 +119,11 @@ function report_invoices_get_data($mtable, $search) {
     $where = "WHERE ctx.contextlevel = '50' AND att.description NOT LIKE '%Status \"A\"%' AND dck.content = 'Regular' ";
 
     if(property_exists($search, "datefrom") && !empty($search->datefrom)&&property_exists($search, "dateto")&&!empty($search->dateto)){
-        $where .="AND att.sessdate BETWEEN {$search->datefrom} AND {$search->dateto} ";
+        $where .="AND FROM_UNIXTIME(att.sessdate,'%Y-%m-%d') BETWEEN FROM_UNIXTIME({$search->datefrom},'%Y-%m-%d') AND FROM_UNIXTIME({$search->dateto},'%Y-%m-%d') ";
         $params['datefrom']=$search->datefrom;
         $params['dateto']=$search->dateto;
     }
+
 
     $groupby = "GROUP BY c.shortname ";
 
@@ -226,7 +227,7 @@ function report_invoices_get_table($mtable, $search) {
         echo get_string("count", "report_invoices", $count);
     }
 
-    $mtable->sortable(true, 'name', SORT_DESC);
+    $mtable->sortable(true, 'name', SORT_ASC);
 
     if ($mtable->is_downloading() && $count) {
         $mtable->pagesize($count, $count);
