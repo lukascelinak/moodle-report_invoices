@@ -48,13 +48,9 @@ function report_invoices_count_data($mtable, $search) {
     JOIN {course} AS c ON a.course = c.id
     LEFT OUTER JOIN {context} AS ctx ON c.id = ctx.instanceid
     LEFT OUTER JOIN {role_assignments} AS ra ON ctx.id = ra.contextid AND (ra.roleid = '3' OR ra.roleid = '4')
-    LEFT OUTER JOIN {user} AS rau ON ra.userid = rau.id
-    JOIN {user_info_data} AS uid ON rau.id = uid.userid AND uid.fieldid = '19'
-    JOIN {data_content} as dc ON c.shortname = dc.content
-    LEFT OUTER JOIN {data_content} as dck ON dc.recordid = dck.recordid AND dck.fieldid = '1340'
-    LEFT OUTER JOIN {course_modules} cm ON cm.instance = a.id AND cm.module = '23' ";
+    LEFT OUTER JOIN {user} AS rau ON ra.userid = rau.id ";
 
-    $where = "WHERE ctx.contextlevel = '50' AND att.description NOT LIKE '%Status \"A\"%' AND dck.content = 'Regular' ";
+    $where = "WHERE ctx.contextlevel = '50' AND att.description NOT LIKE '%Status \"A\"%' ";
 
     if(property_exists($search, "datefrom") && !empty($search->datefrom)&&property_exists($search, "dateto")&&!empty($search->dateto)){
         $where .="AND FROM_UNIXTIME(att.sessdate,'%Y-%m-%d') BETWEEN FROM_UNIXTIME({$search->datefrom},'%Y-%m-%d') AND FROM_UNIXTIME({$search->dateto},'%Y-%m-%d') ";
@@ -89,20 +85,27 @@ function report_invoices_get_data($mtable, $search) {
              c.fullname as coursefullname,
              c.shortname as course,
              null as actions,
-             cast(count(*) * (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1335') as decimal(10,2)) as amount,
-             ROUND(((SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1335')
-             +((SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1335')/100)*:vatvalue)*count(*), 0) as totalamount,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1333') as itemcode,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1334') as itemname,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '15') as name,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1335') as itemprice,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '78') as idnumber,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1336') as vatnumber,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '77') as street,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1337') as zip,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1338') as city,
-             (SELECT dca.content FROM {data_content} AS dca WHERE dca.recordid = dc.recordid AND dca.fieldid = '1339') as description,
-             dck.content as payment,
+             c.shortname,
+             f.nom as Name,
+             f.siren as idnumber,
+             f.tva_intra as vatnumber,
+             f.address as street,
+             f.zip as zip,
+             f.town as city,
+             'CZ - Česká republika' as country,
+             'CZK' as currency,
+             'Item code - doplnit' as itemcode,
+             'Item name - doplnit' as itemname,
+             CONCAT((FROM_UNIXTIME(UNIX_TIMESTAMP(LAST_DAY(DATE_SUB(NOW(), INTERVAL 1 MONTH))), '%m/%Y')),' ',e.ref_customer) as description,
+             cast(e.price as decimal(10,2))  as itemprice,
+             count(distinct a.id) as quantity,
+             ROUND (a.duration / 3600, 1) as duration,
+             cast((count(distinct a.id)) * (e.price * (ROUND (a.duration / 3600, 1))) as decimal(10,2)) as amount,
+             '21.00' as vat,
+             ROUND((count(distinct a.id)) * (e.price * (ROUND (a.duration / 3600, 1))) + ((count(distinct a.id)) * (e.price * (ROUND (a.duration / 3600, 1)))*0.21),0) as totalamount,
+             FROM_UNIXTIME(UNIX_TIMESTAMP(LAST_DAY(DATE_SUB(NOW(), INTERVAL 1 MONTH))), '%Y-%m-%d') as datetax,
+             CURRENT_DATE() as issuancedate,
+             DATE_ADD(CURRENT_DATE(), INTERVAL 14 DAY) as duedate
              count(*) as itemtotal ";
     $from = "FROM {attendance_sessions} AS att ";
     $join = "LEFT JOIN {user} AS u ON att.lasttakenby = u.id
@@ -111,12 +114,11 @@ function report_invoices_get_data($mtable, $search) {
     LEFT OUTER JOIN {context} AS ctx ON c.id = ctx.instanceid
     LEFT OUTER JOIN {role_assignments} AS ra ON ctx.id = ra.contextid AND (ra.roleid = '3' OR ra.roleid = '4')
     LEFT OUTER JOIN {user} AS rau ON ra.userid = rau.id
-    JOIN {user_info_data} AS uid ON rau.id = uid.userid AND uid.fieldid = '19'
-    JOIN {data_content} as dc ON c.shortname = dc.content
-    LEFT OUTER JOIN {data_content} as dck ON dc.recordid = dck.recordid AND dck.fieldid = '1340'
-    LEFT OUTER JOIN {course_modules} cm ON cm.instance = a.id AND cm.module = '23' ";
+    JOIN corp2.llx_product as d ON c.shortname = d.ref 
+    JOIN corp2.llx_product_customer_price as e ON d.rowid = e.fk_product
+    JOIN corp2.llx_societe as f ON e.fk_soc = f.rowid ";
 
-    $where = "WHERE ctx.contextlevel = '50' AND att.description NOT LIKE '%Status \"A\"%' AND dck.content = 'Regular' ";
+    $where = "WHERE ctx.contextlevel = '50' AND att.description NOT LIKE '%Status \"A\"%' ";
 
     if(property_exists($search, "datefrom") && !empty($search->datefrom)&&property_exists($search, "dateto")&&!empty($search->dateto)){
         $where .="AND FROM_UNIXTIME(att.sessdate,'%Y-%m-%d') BETWEEN FROM_UNIXTIME({$search->datefrom},'%Y-%m-%d') AND FROM_UNIXTIME({$search->dateto},'%Y-%m-%d') ";
@@ -161,6 +163,7 @@ function report_invoices_get_table($mtable, $search) {
     $columns[]="description";
     $columns[]="itemprice";
     $columns[]="itemtotal";
+    $mtable->is_downloading()?$columns[]="vat":false;
     $columns[]="amount";
     $columns[]="totalamount";
     $columns[]="datetax";
