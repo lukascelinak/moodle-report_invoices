@@ -98,14 +98,14 @@ function report_invoices_get_data($mtable, $search) {
              'Item name - doplnit' as itemname,
              CONCAT((FROM_UNIXTIME(UNIX_TIMESTAMP(LAST_DAY(DATE_SUB(NOW(), INTERVAL 1 MONTH))), '%m/%Y')),' ',e.ref_customer) as description,
              cast(e.price as decimal(10,2))  as itemprice,
-             count(distinct a.id) as quantity,
-             ROUND (a.duration / 3600, 1) as duration,
-             cast((count(distinct a.id)) * (e.price * (ROUND (a.duration / 3600, 1))) as decimal(10,2)) as amount,
+             count(distinct att.id) as quantity,
+             ROUND (att.duration / 3600, 1) as duration,
+             cast((count(distinct att.id)) * (e.price * (ROUND (att.duration / 3600, 1))) as decimal(10,2)) as amount,
              '21.00' as vat,
-             ROUND((count(distinct a.id)) * (e.price * (ROUND (a.duration / 3600, 1))) + ((count(distinct a.id)) * (e.price * (ROUND (a.duration / 3600, 1)))*0.21),0) as totalamount,
+             ROUND((count(distinct att.id)) * (e.price * (ROUND (att.duration / 3600, 1))) + ((count(distinct att.id)) * (e.price * (ROUND (att.duration / 3600, 1)))*0.21),0) as totalamount,
              FROM_UNIXTIME(UNIX_TIMESTAMP(LAST_DAY(DATE_SUB(NOW(), INTERVAL 1 MONTH))), '%Y-%m-%d') as datetax,
              CURRENT_DATE() as issuancedate,
-             DATE_ADD(CURRENT_DATE(), INTERVAL 14 DAY) as duedate
+             DATE_ADD(CURRENT_DATE(), INTERVAL 14 DAY) as duedate,
              count(*) as itemtotal ";
     $from = "FROM {attendance_sessions} AS att ";
     $join = "LEFT JOIN {user} AS u ON att.lasttakenby = u.id
